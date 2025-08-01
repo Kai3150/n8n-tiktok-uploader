@@ -3,11 +3,15 @@ import threading
 import time
 import json
 from typing import Optional, List
-from omnipilot.config import CLIENT_KEY, CLIENT_SECRET, TOKEN_URL
+import os
 import requests
 import logging
 import boto3
 from botocore.exceptions import ClientError
+
+CLIENT_KEY = os.getenv("CLIENT_KEY")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+TOKEN_URL = os.getenv("TOKEN_URL")
 
 TOKEN_FILE = "tiktok_tokens.json"
 BUCKET_NAME = "tiktok-token-store"
