@@ -1,0 +1,199 @@
+{
+  "name": "TikTok Video Upload",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "https://your-api-gateway-url.amazonaws.com/token/{{$json.open_id}}",
+        "options": {}
+      },
+      "id": "2b3c4d5e-6f78-9012-3456-789abcdef012",
+      "name": "Get TikTok Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://open.tiktokapis.com/v2/post/publish/video/init/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$json.access_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "post_info",
+              "value": "={{\"title\": $json.video_title, \"privacy_level\": \"PUBLIC_TO_EVERYONE\", \"disable_duet\": false, \"disable_comment\": false, \"disable_stitch\": false}}"
+            },
+            {
+              "name": "source_info",
+              "value": "={{\"source\": \"PULL_FROM_URL\", \"video_url\": $json.video_url}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3c4d5e6f-7890-1234-5678-9abcdef01234",
+      "name": "Initialize TikTok Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://open.tiktokapis.com/v2/post/publish/status/fetch/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$('Get TikTok Token').item.json.access_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "publish_id",
+              "value": "={{$json.data.publish_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4d5e6f78-9012-3456-789a-bcdef0123456",
+      "name": "Check Upload Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "open_id",
+              "value": "your_tiktok_open_id_here"
+            },
+            {
+              "name": "video_title",
+              "value": "My automated TikTok post #n8n #automation"
+            },
+            {
+              "name": "video_url",
+              "value": "https://example.com/path/to/your/video.mp4"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e6f7890-1234-5678-9abc-def012345678",
+      "name": "Set Video Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        240,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Set Video Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get TikTok Token": {
+      "main": [
+        [
+          {
+            "node": "Initialize TikTok Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize TikTok Upload": {
+      "main": [
+        [
+          {
+            "node": "Check Upload Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Video Data": {
+      "main": [
+        [
+          {
+            "node": "Get TikTok Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "tag-tiktok",
+      "name": "TikTok"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
