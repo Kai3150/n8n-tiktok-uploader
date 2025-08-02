@@ -83,7 +83,7 @@ jobs:
       run: |
         aws lambda update-function-configuration \
           --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --environment Variables={TIKTOK_TOKEN_BUCKET=tiktok-token-store,TIKTOK_TOKEN_KEY=tiktok_tokens.json,CLIENT_KEY=${{ secrets.TIKTOK_CLIENT_KEY }},CLIENT_SECRET=${{ secrets.TIKTOK_CLIENT_SECRET }},TOKEN_URL=https://open.tiktokapis.com/v2/oauth/token/}
+          --environment '{"Variables": {"TIKTOK_TOKEN_BUCKET": "tiktok-token-store", "TIKTOK_TOKEN_KEY": "tiktok_tokens.json", "CLIENT_KEY": "'"${{ secrets.TIKTOK_CLIENT_KEY }}"'", "CLIENT_SECRET": "'"${{ secrets.TIKTOK_CLIENT_SECRET }}"'", "TOKEN_URL": "https://open.tiktokapis.com/v2/oauth/token/"}}'
 
     - name: Wait for deployment to complete
       run: |
