@@ -1,0 +1,103 @@
+name: Deploy Lambda Token API
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'lambda_token_api/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'lambda_token_api/**'
+
+env:
+  AWS_REGION: ap-northeast-1
+  LAMBDA_FUNCTION_NAME: tiktok-token-api
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd lambda_token_api
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+    
+    - name: Run tests
+      run: |
+        cd lambda_token_api
+        python -m pytest tests/ -v
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Install dependencies
+      run: |
+        cd lambda_token_api
+        mkdir -p dependencies
+        pip install -r requirements.txt -t dependencies/
+    
+    - name: Create deployment package
+      run: |
+        cd lambda_token_api
+        # Copy source files
+        cp -r src/* .
+        # Create deployment zip
+        zip -r ../lambda-deployment.zip . -x "tests/*" "__pycache__/*" "*.pyc" ".git/*"
+    
+    - name: Deploy to Lambda
+      run: |
+        aws lambda update-function-code \
+          --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+          --zip-file fileb://lambda-deployment.zip
+    
+    - name: Update Lambda environment variables
+      run: |
+        aws lambda update-function-configuration \
+          --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+          --environment Variables='{
+            "TIKTOK_TOKEN_BUCKET":"tiktok-token-store",
+            "TIKTOK_TOKEN_KEY":"tiktok_tokens.json",
+            "CLIENT_KEY":"${{ secrets.TIKTOK_CLIENT_KEY }}",
+            "CLIENT_SECRET":"${{ secrets.TIKTOK_CLIENT_SECRET }}",
+            "TOKEN_URL":"https://open.tiktokapis.com/v2/oauth/token/"
+          }'
+    
+    - name: Wait for deployment to complete
+      run: |
+        aws lambda wait function-updated \
+          --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
+    
+    - name: Test deployment
+      run: |
+        aws lambda invoke \
+          --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+          --payload '{"httpMethod":"GET","pathParameters":{"open_id":"test"}}' \
+          response.json
+        cat response.json
