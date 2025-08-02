@@ -68,10 +68,12 @@ jobs:
     - name: Create deployment package
       run: |
         cd lambda_token_api
-        # Copy source files
+        # Copy source files to root
         cp -r src/* .
+        # Copy dependencies to root
+        cp -r dependencies/* .
         # Create deployment zip
-        zip -r ../lambda-deployment.zip . -x "tests/*" "__pycache__/*" "*.pyc" ".git/*"
+        zip -r ../lambda-deployment.zip . -x "src/*" "dependencies/*" "tests/*" "__pycache__/*" "*.pyc" ".git/*" "build.sh" "*.md"
 
     - name: Deploy to Lambda
       run: |
