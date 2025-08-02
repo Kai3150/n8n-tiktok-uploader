@@ -1,6 +1,7 @@
 # Lambda Token API
 
 AWS LambdaでTikTokアクセストークンを管理・提供するAPIです。
+CI/CD自動デプロイ対応済み。
 n8nから安全にトークンを取得するためのエンドポイントを提供します。
 
 ## 機能
