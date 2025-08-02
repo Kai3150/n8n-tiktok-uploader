@@ -80,13 +80,13 @@ jobs:
           --zip-file fileb://lambda-deployment.zip \
           --region ${{ env.AWS_REGION }}
 
-    - name: Update Lambda configuration
-      run: |
-        aws lambda update-function-configuration \
-          --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --timeout 300 \
-          --memory-size 512 \
-          --region ${{ env.AWS_REGION }}
+    # - name: Update Lambda configuration
+    #   run: |
+    #     aws lambda update-function-configuration \
+    #       --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+    #       --timeout 300 \
+    #       --memory-size 512 \
+    #       --region ${{ env.AWS_REGION }}
 
     - name: Test deployment
       run: |
