@@ -94,6 +94,6 @@ jobs:
         # Add specific test for the function if needed
         aws lambda invoke \
           --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --payload '{"video_url": "https://example.com/test.mp4"}' \
+          --payload '{"video_url": "https://v3.fal.media/files/rabbit/PWegvgzZwbX2TYt3pNtwr_output.mp4"}' \
           --region ${{ env.AWS_REGION }} \
           response.json || echo "Test invocation completed"
