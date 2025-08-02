@@ -5,10 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'lambda_token_api/**'
+      - '.github/workflows/deploy.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'lambda_token_api/**'
+      - '.github/workflows/deploy.yml'
 
 env:
   AWS_REGION: ap-northeast-1
