@@ -5,10 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'r2-to-tiktok-poster/**'
+      - '.github/workflows/deploy-r2-to-tiktok.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'r2-to-tiktok-poster/**'
+      - '.github/workflows/deploy-r2-to-tiktok.yml'
 
 env:
   AWS_REGION: ap-northeast-1
@@ -17,22 +19,22 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python 3.12
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
-    
+
     - name: Install dependencies
       run: |
         cd r2-to-tiktok-poster
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-mock
-    
+
     - name: Run tests
       run: |
         cd r2-to-tiktok-poster
@@ -42,10 +44,10 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python 3.12
       uses: actions/setup-python@v4
       with:
