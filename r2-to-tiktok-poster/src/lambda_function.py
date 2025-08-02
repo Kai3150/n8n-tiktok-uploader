@@ -46,8 +46,36 @@ def make_tiktok_api_request(endpoint: str, data: Dict[str, Any], access_token: s
     
     return response_data
 
+def query_creator_info(access_token: str) -> Dict[str, Any]:
+    """
+    Query creator information before posting (required by TikTok UX guidelines)
+    
+    Args:
+        access_token: TikTok access token
+    
+    Returns:
+        Dict containing creator info including privacy options and settings
+    """
+    endpoint = "/v2/post/publish/creator_info/query/"
+    response_data = make_tiktok_api_request(endpoint, {}, access_token)
+    return response_data["data"]
+
 def prepare_video_source(video_path: str) -> Dict[str, str]:
-    """Prepare video source information for TikTok API"""
+    """
+    Prepare video source information for TikTok API (URL sources only)
+    
+    Args:
+        video_path: URL to video file
+    
+    Returns:
+        Dict containing source info for TikTok API
+    
+    Raises:
+        ValueError: If video_path is not a valid URL
+    """
+    if not video_path.startswith(("http://", "https://")):
+        raise ValueError(f"Only URL sources are supported. Got: {video_path}")
+    
     return {"source": "PULL_FROM_URL", "video_url": video_path}
 
 def post_video_to_tiktok(
@@ -66,8 +94,8 @@ def post_video_to_tiktok(
     Args:
         access_token: TikTok access token
         title: Video title/caption
-        video_path: URL to video file
-        privacy_level: Privacy setting
+        video_path: URL to video file (only URL sources supported)
+        privacy_level: Privacy setting (PUBLIC_TO_EVERYONE, MUTUAL_FOLLOW_FRIENDS, SELF_ONLY)
         disable_duet: Whether to disable duet feature
         disable_comment: Whether to disable comments
         disable_stitch: Whether to disable stitch feature
@@ -76,6 +104,14 @@ def post_video_to_tiktok(
     Returns:
         str: publish_id for tracking the post status
     """
+    
+    creator_info = query_creator_info(access_token)
+    
+    available_privacy_levels = creator_info.get("privacy_level_options", [])
+    if privacy_level not in available_privacy_levels:
+        raise ValueError(
+            f"Privacy level '{privacy_level}' not available. Options: {available_privacy_levels}"
+        )
     
     video_info = prepare_video_source(video_path)
     
@@ -179,6 +215,24 @@ def lambda_handler(event, context):
                 'body': json.dumps({
                     'success': False,
                     'error': 'Failed to get access token for the specified open_id'
+                })
+            }
+        
+        logger.info(f"Querying creator info for validation (TikTok UX guidelines)")
+        try:
+            creator_info = query_creator_info(access_token)
+            logger.info(f"Available privacy levels: {creator_info.get('privacy_level_options', [])}")
+        except Exception as e:
+            logger.error(f"Failed to query creator info: {str(e)}")
+            return {
+                'statusCode': 400,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({
+                    'success': False,
+                    'error': f'Failed to query creator info: {str(e)}'
                 })
             }
         
