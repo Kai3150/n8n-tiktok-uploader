@@ -83,8 +83,4 @@ jobs:
     - name: Test fal-to-r2 deployment
       run: |
         echo "Testing fal-to-r2-uploader deployment..."
-        curl -X POST https://6kg6mdmiz6.execute-api.ap-northeast-1.amazonaws.com/prod/fal-to-r2 \\
-          -H "Content-Type: application/json" \\
-          -d '{
-            "video_url": "https://v3.fal.media/files/rabbit/PWegvgzZwbX2TYt3pNtwr_output.mp4"
-          }'
+        curl -X POST https://6kg6mdmiz6.execute-api.ap-northeast-1.amazonaws.com/prod/fal-to-r2 -H "Content-Type: application/json" -d '{"video_url": "https://v3.fal.media/files/rabbit/PWegvgzZwbX2TYt3pNtwr_output.mp4"}'

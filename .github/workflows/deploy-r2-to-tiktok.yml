@@ -83,9 +83,7 @@ jobs:
     - name: Test r2-to-tiktok deployment
       run: |
         echo "Testing r2-to-tiktok-poster deployment..."
-        curl -X POST https://6kg6mdmiz6.execute-api.ap-northeast-1.amazonaws.com/prod/r2-to-tiktok \\
-          -H "Content-Type: application/json" \\
-          -d '{
+        curl -X POST https://6kg6mdmiz6.execute-api.ap-northeast-1.amazonaws.com/prod/r2-to-tiktok -H "Content-Type: application/json" -d '{
             "r2_video_url": "https://video-worker.hurukawasiro3150.workers.dev/videos/tokyo1.mp4",
             "open_id": "${{ secrets.TIKTOK_TEST_OPEN_ID }}",
             "title": "Test video upload #test",
