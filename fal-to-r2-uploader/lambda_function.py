@@ -96,7 +96,7 @@ def lambda_handler(event, context):
             }
         )
 
-        r2_url = f"https://video-worker.hurukawasiro3150.workers.dev/videos/videos/{unique_filename}"
+        r2_url = f"https://video-worker.hurukawasiro3150.workers.dev/videos/{unique_filename}"
 
         logger.info(f"Successfully uploaded video to R2: {r2_url}")
 
