@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Build script for TikTok Lambda Token API
 # This script creates a deployment package for AWS Lambda
 
 set -e
@@ -19,12 +18,9 @@ pip install -r requirements.txt -t dependencies/
 
 # Create deployment package
 echo "📁 Creating deployment package..."
-# Copy source files to root for Lambda
-cp -r src/* .
 
 # Create zip file excluding unnecessary files
 zip -r lambda-deployment.zip . \
-  -x "src/*" \
   -x "tests/*" \
   -x "__pycache__/*" \
   -x "*.pyc" \

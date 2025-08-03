@@ -53,7 +53,7 @@ lambda-*.zip
 deployment-package/
 
 # Dependencies
-lambda_token_api/dependencies/
+dependencies/
 
 # IDE & Editors
 .vscode/
