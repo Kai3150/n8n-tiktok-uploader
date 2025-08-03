@@ -7,7 +7,6 @@ import json
 import logging
 import boto3
 import requests
-from botocore.exceptions import ClientError
 import uuid
 from urllib.parse import urlparse
 
@@ -15,21 +14,15 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def get_r2_credentials():
-    """Retrieve R2 credentials from AWS Secrets Manager"""
-    secrets_client = boto3.client('secretsmanager', region_name='ap-northeast-1')
-
+    """Retrieve R2 credentials from environment variables"""
     try:
-        endpoint_response = secrets_client.get_secret_value(SecretId='r2_endpoint_url')
-        access_key_response = secrets_client.get_secret_value(SecretId='r2_access_key_id')
-        secret_key_response = secrets_client.get_secret_value(SecretId='r2_secret_access_key')
-
         return {
-            'endpoint_url': endpoint_response['SecretString'],
-            'access_key_id': access_key_response['SecretString'],
-            'secret_access_key': secret_key_response['SecretString']
+            'endpoint_url': os.environ['R2_ENDPOINT_URL'],
+            'access_key_id': os.environ['R2_ACCESS_KEY_ID'],
+            'secret_access_key': os.environ['R2_SECRET_ACCESS_KEY']
         }
-    except ClientError as e:
-        logger.error(f"Failed to retrieve R2 credentials: {str(e)}")
+    except KeyError as e:
+        logger.error(f"Missing required environment variable: {str(e)}")
         raise
 
 def lambda_handler(event, context):
@@ -131,8 +124,8 @@ def lambda_handler(event, context):
             })
         }
 
-    except ClientError as e:
-        logger.error(f"AWS S3/R2 error: {str(e)}")
+    except Exception as s3_error:
+        logger.error(f"AWS S3/R2 error: {str(s3_error)}")
         return {
             'statusCode': 500,
             'headers': {
@@ -141,7 +134,7 @@ def lambda_handler(event, context):
             },
             'body': json.dumps({
                 'success': False,
-                'error': f'Failed to upload to R2: {str(e)}'
+                'error': f'Failed to upload to R2: {str(s3_error)}'
             })
         }
 
