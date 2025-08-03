@@ -123,6 +123,20 @@ def lambda_handler(event, context):
             })
         }
 
+    except KeyError as e:
+        logger.error(f"Missing environment variable: {str(e)}")
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                'success': False,
+                'error': f'Missing environment variable: {str(e)}'
+            })
+        }
+
     except Exception as s3_error:
         logger.error(f"AWS S3/R2 error: {str(s3_error)}")
         return {

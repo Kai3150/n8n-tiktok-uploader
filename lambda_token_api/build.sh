@@ -31,10 +31,6 @@ zip -r lambda-deployment.zip . \
 echo "✅ Deployment package created: lambda-deployment.zip"
 echo "📊 Package size: $(du -h lambda-deployment.zip | cut -f1)"
 
-# Cleanup temporary files
-echo "🧹 Cleaning up temporary files..."
-rm -f lambda_function.py token_store.py __init__.py
-
 echo "🎉 Build completed successfully!"
 echo ""
 echo "Next steps:"
