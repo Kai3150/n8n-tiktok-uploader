@@ -17,7 +17,7 @@ def get_r2_credentials():
     """Retrieve R2 credentials from environment variables"""
     try:
         return {
-            'endpoint_url': "https://video-worker.hurukawasiro3150.workers.dev/videos/",
+            'endpoint_url': os.environ['R2_ENDPOINT_URL'],
             'access_key_id': os.environ['R2_ACCESS_KEY_ID'],
             'secret_access_key': os.environ['R2_SECRET_ACCESS_KEY']
         }
@@ -96,7 +96,7 @@ def lambda_handler(event, context):
             }
         )
 
-        r2_url = f"{r2_credentials['endpoint_url']}/videos/{unique_filename}"
+        r2_url = f"https://video-worker.hurukawasiro3150.workers.dev/videos/videos/{unique_filename}"
 
         logger.info(f"Successfully uploaded video to R2: {r2_url}")
 
