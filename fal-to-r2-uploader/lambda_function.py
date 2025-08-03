@@ -17,7 +17,7 @@ def get_r2_credentials():
     """Retrieve R2 credentials from environment variables"""
     try:
         return {
-            'endpoint_url': os.environ['R2_ENDPOINT_URL'],
+            'endpoint_url': "https://video-worker.hurukawasiro3150.workers.dev/videos/",
             'access_key_id': os.environ['R2_ACCESS_KEY_ID'],
             'secret_access_key': os.environ['R2_SECRET_ACCESS_KEY']
         }
