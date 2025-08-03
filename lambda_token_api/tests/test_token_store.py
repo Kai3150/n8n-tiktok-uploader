@@ -6,13 +6,12 @@ Run this locally to test S3 token operations before deploying to Lambda
 
 import os
 import sys
-import json
 from datetime import datetime
 
 # Add the current directory to the path so we can import token_store
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'dependencies'))
 
-from src.token_store import TokenStore
+from token_store import TokenStore
 
 def test_token_operations():
     """Test basic token store operations"""

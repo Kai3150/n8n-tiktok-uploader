@@ -1,4 +1,8 @@
-# token_store.py
+import sys
+import os
+# 相対パスで dependencies ディレクトリを追加
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'dependencies'))
+
 import threading
 import time
 import json
