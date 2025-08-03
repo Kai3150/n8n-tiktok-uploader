@@ -87,7 +87,7 @@ def post_video_to_tiktok(
     access_token: str,
     title: str,
     video_path: str,
-    privacy_level: str = "PUBLIC_TO_EVERYONE",
+    privacy_level: str = "SELF_ONLY",
     disable_duet: bool = False,
     disable_comment: bool = False,
     disable_stitch: bool = False,
@@ -201,7 +201,7 @@ def lambda_handler(event, context):
                 })
             }
 
-        privacy_level = body.get('privacy_level', 'PUBLIC_TO_EVERYONE')
+        privacy_level = body.get('privacy_level', 'SELF_ONLY')
         disable_duet = body.get('disable_duet', False)
         disable_comment = body.get('disable_comment', False)
         disable_stitch = body.get('disable_stitch', False)
