@@ -75,21 +75,20 @@ def lambda_handler(event, context):
         unique_filename = f"{uuid.uuid4()}.{file_extension}"
 
         logger.info(f"Downloading video from {video_url}")
-        response = requests.get(video_url, stream=True)
+        response = requests.get(video_url)
         response.raise_for_status()
 
-        content_length = response.headers.get('content-length')
-        if content_length:
-            logger.info(f"Video size: {content_length} bytes")
+        content_length = len(response.content)
+        logger.info(f"Video size: {content_length} bytes")
 
         logger.info(f"Uploading to R2 bucket: my-tiktok-videos/{unique_filename}")
+        from io import BytesIO
         s3_client.upload_fileobj(
-            response.raw,
+            BytesIO(response.content),
             'my-tiktok-videos',
             unique_filename,
             ExtraArgs={
-                'ContentType': 'video/mp4',
-                'ACL': 'public-read'
+                'ContentType': 'video/mp4'
             }
         )
 
