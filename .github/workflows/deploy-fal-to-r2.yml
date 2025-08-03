@@ -5,12 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'fal-to-r2-uploader/**'
-      - '.github/workflows/deploy-fal-to-r2-uploader.yml'
+      - '.github/workflows/deploy-fal-to-r2.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'fal-to-r2-uploader/**'
-      - '.github/workflows/deploy-fal-to-r2-uploader.yml'
+      - '.github/workflows/deploy-fal-to-r2.yml'
 
 env:
   AWS_REGION: ap-northeast-1
@@ -80,20 +80,11 @@ jobs:
           --zip-file fileb://lambda-deployment.zip \
           --region ${{ env.AWS_REGION }}
 
-    # - name: Update Lambda configuration
-    #   run: |
-    #     aws lambda update-function-configuration \
-    #       --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-    #       --timeout 300 \
-    #       --memory-size 512 \
-    #       --region ${{ env.AWS_REGION }}
-
-    - name: Test deployment
+    - name: Test fal-to-r2 deployment
       run: |
         echo "Testing fal-to-r2-uploader deployment..."
-        # Add specific test for the function if needed
-        aws lambda invoke \
-          --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --payload '{"video_url": "https://v3.fal.media/files/rabbit/PWegvgzZwbX2TYt3pNtwr_output.mp4"}' \
-          --region ${{ env.AWS_REGION }} \
-          response.json || echo "Test invocation completed"
+        curl -X POST https://6kg6mdmiz6.execute-api.ap-northeast-1.amazonaws.com/prod/fal-to-r2 \\
+          -H "Content-Type: application/json" \\
+          -d '{
+            "video_url": "https://v3.fal.media/files/rabbit/PWegvgzZwbX2TYt3pNtwr_output.mp4"
+          }'

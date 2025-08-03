@@ -80,20 +80,17 @@ jobs:
           --zip-file fileb://lambda-deployment.zip \
           --region ${{ env.AWS_REGION }}
 
-    # - name: Update Lambda configuration
-    #   run: |
-    #     aws lambda update-function-configuration \
-    #       --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-    #       --timeout 300 \
-    #       --memory-size 512 \
-    #       --region ${{ env.AWS_REGION }}
-
-    - name: Test deployment
+    - name: Test r2-to-tiktok deployment
       run: |
         echo "Testing r2-to-tiktok-poster deployment..."
-        # Add specific test for the function if needed
-        aws lambda invoke \
-          --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --payload '{"r2_video_url": "https://233398d8-video-worker.hurukawasiro3150.workers.dev/videos/toyko1.mp4", "open_id": "${{ secrets.TIKTOK_TEST_OPEN_ID }}", "title": "Test"}' \
-          --region ${{ env.AWS_REGION }} \
-          response.json || echo "Test invocation completed"
+        curl -X POST https://6kg6mdmiz6.execute-api.ap-northeast-1.amazonaws.com/prod/r2-to-tiktok \\
+          -H "Content-Type: application/json" \\
+          -d '{
+            "r2_video_url": "https://233398d8-video-worker.hurukawasiro3150.workers.dev/videos/toyko1.mp4",
+            "open_id": "${{ secrets.TIKTOK_TEST_OPEN_ID }}",
+            "title": "Test video upload #test",
+            "privacy_level": "SELF_ONLY",
+            "disable_duet": false,
+            "disable_comment": false,
+            "disable_stitch": false
+          }'
